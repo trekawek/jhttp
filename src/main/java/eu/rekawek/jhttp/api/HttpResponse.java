@@ -1,53 +1,20 @@
 package eu.rekawek.jhttp.api;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
-import org.apache.commons.io.IOUtils;
+public interface HttpResponse {
 
-public class HttpResponse {
+    void addHeader(String name, String value);
 
-    private int statusCode = 200;
+    void setHeader(String name, String value);
 
-    private String statusMessage = "OK";
+    void setContentType(String contentType);
 
-    private InputStream stream = new ByteArrayInputStream(new byte[0]);
+    void setStatus(int code, String message);
 
-    private List<Header> headers = new ArrayList<Header>();
+    PrintWriter getPrintWriter();
 
-    public List<Header> getHeaders() {
-        return headers;
-    }
-
-    public InputStream getInputStream() {
-        return stream;
-    }
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public String getStatusMessage() {
-        return statusMessage;
-    }
-
-    public void setStatus(int code, String message) {
-        this.statusCode = code;
-        this.statusMessage = message;
-    }
-
-    public void setInputStream(InputStream stream) {
-        this.stream = stream;
-    }
-
-    public void setBody(String body) {
-        setInputStream(IOUtils.toInputStream(body));
-    }
-
-    public void addHeader(String name, String value) {
-        headers.add(new Header(name, value));
-    }
+    OutputStream getOutputStream();
 
 }

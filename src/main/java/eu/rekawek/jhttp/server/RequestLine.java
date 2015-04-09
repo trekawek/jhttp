@@ -1,4 +1,4 @@
-package eu.rekawek.jhttp.api;
+package eu.rekawek.jhttp.server;
 
 import org.apache.commons.lang3.StringUtils;
 

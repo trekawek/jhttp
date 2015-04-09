@@ -1,30 +1,15 @@
 package eu.rekawek.jhttp.api;
 
-import java.util.List;
+import java.io.File;
 
-public class HttpRequest {
-    private final String clientHostname;
+public interface HttpRequest {
 
-    private final RequestLine requestLine;
+    String getUri();
 
-    private final List<Header> headers;
+    String getHeaderValue(String name);
 
-    public HttpRequest(String clientHostname, RequestLine requestLine, List<Header> headers) {
-        this.clientHostname = clientHostname;
-        this.requestLine = requestLine;
-        this.headers = headers;
-    }
+    File resolveFile();
 
-    public String getClientHostname() {
-        return clientHostname;
-    }
-
-    public RequestLine getRequestLine() {
-        return requestLine;
-    }
-
-    public List<Header> getHeaders() {
-        return headers;
-    }
+    String getHttpVersion();
 
 }

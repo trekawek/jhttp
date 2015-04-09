@@ -1,4 +1,4 @@
-package eu.rekawek.jhttp;
+package eu.rekawek.jhttp.server;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,24 +25,27 @@ public class HttpServer {
 
     private final List<RequestProcessor> processors;
 
+    private final FileResolver fileResolver;
+
     private ServerSocket serverSocket;
 
     public HttpServer(final File serverRoot) {
         this.executor = Executors.newFixedThreadPool(THREADS_NO);
+        this.fileResolver = new FileResolver(serverRoot);
 
-        final FileResolver fileResolver = new FileResolver(serverRoot);
         processors = new ArrayList<>();
-        processors.add(new DirectoryIndex(fileResolver));
-        processors.add(new DirectoryListing(fileResolver));
-        processors.add(new StaticFile(fileResolver));
-        processors.add(new ResourceNotFound(fileResolver));
+        processors.add(new DirectoryIndex());
+        processors.add(new DirectoryListing());
+        processors.add(new StaticFile());
+        processors.add(new ResourceNotFound());
     }
 
     public void start() throws IOException {
         serverSocket = new ServerSocket(HTTP_PORT);
         do {
             final Socket clientSocket = serverSocket.accept();
-            final ConnectionHandler connectionHandler = new ConnectionHandler(clientSocket, processors);
+            final ConnectionHandler connectionHandler = new ConnectionHandler(clientSocket, processors,
+                    fileResolver);
             executor.submit(connectionHandler);
         } while (!serverSocket.isClosed());
     }

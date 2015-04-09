@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.rekawek.jhttp.server.HttpServer;
+
 public class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
@@ -19,6 +21,11 @@ public class Main {
         }
 
         final HttpServer server = new HttpServer(serverRoot);
+        stopServerOnShutdown(server);
+        server.start();
+    }
+
+    private static void stopServerOnShutdown(final HttpServer server) {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -29,7 +36,6 @@ public class Main {
                 }
             }
         });
-        server.start();
     }
 
 }

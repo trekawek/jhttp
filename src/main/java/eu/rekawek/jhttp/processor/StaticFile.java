@@ -2,24 +2,21 @@ package eu.rekawek.jhttp.processor;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLConnection;
 
-import eu.rekawek.jhttp.FileResolver;
+import org.apache.commons.io.IOUtils;
+
 import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
 import eu.rekawek.jhttp.api.RequestProcessor;
 
 public class StaticFile implements RequestProcessor {
 
-    private final FileResolver fileResolver;
-
-    public StaticFile(FileResolver fileResolver) {
-        this.fileResolver = fileResolver;
-    }
-
-    public boolean process(HttpRequest request, HttpResponse response) throws FileNotFoundException {
-        final File file = fileResolver.resolveFile(request);
+    @Override
+    public boolean process(HttpRequest request, HttpResponse response) throws IOException {
+        final File file = request.resolveFile();
         if (!file.isFile()) {
             return false;
         }
@@ -28,11 +25,13 @@ public class StaticFile implements RequestProcessor {
         return true;
     }
 
-    static void serveFile(File file, HttpResponse response) throws FileNotFoundException {
+    static void serveFile(File file, HttpResponse response) throws IOException {
         final String contentType = URLConnection.guessContentTypeFromName(file.getName());
         if (contentType != null) {
             response.addHeader("Content-Type", contentType);
         }
-        response.setInputStream(new FileInputStream(file));
+        try (final InputStream is = new FileInputStream(file)) {
+            IOUtils.copy(is, response.getOutputStream());
+        }
     }
 }

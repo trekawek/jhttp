@@ -1,10 +1,8 @@
-package eu.rekawek.jhttp;
+package eu.rekawek.jhttp.server;
 
 import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
-
-import eu.rekawek.jhttp.api.HttpRequest;
 
 public class FileResolver {
 
@@ -14,8 +12,7 @@ public class FileResolver {
         this.serverRoot = serverRoot;
     }
 
-    public File resolveFile(HttpRequest request) {
-        final String uri = request.getRequestLine().getUri();
+    public File resolveFile(String uri) {
         return new File(serverRoot, StringUtils.removeStart(uri, "/"));
     }
 }
