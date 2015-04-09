@@ -12,6 +12,12 @@ import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
 import eu.rekawek.jhttp.api.RequestProcessor;
 
+/**
+ * This processor renders a static file.
+ * 
+ * @author Tomasz Rękawek
+ *
+ */
 public class StaticFile implements RequestProcessor {
 
     @Override

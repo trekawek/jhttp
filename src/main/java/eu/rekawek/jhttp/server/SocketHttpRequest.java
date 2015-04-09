@@ -3,15 +3,22 @@ package eu.rekawek.jhttp.server;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 import eu.rekawek.jhttp.api.HttpRequest;
 
+/**
+ * This class parses the socket's input stream and exposes result in a form of a {@link HttpRequest}
+ * implementation.
+ * 
+ * @author Tomasz Rękawek
+ *
+ */
 public class SocketHttpRequest implements HttpRequest {
-
-    private final String clientHostname;
 
     private final RequestLine requestLine;
 
@@ -19,32 +26,20 @@ public class SocketHttpRequest implements HttpRequest {
 
     private final FileResolver fileResolver;
 
-    public SocketHttpRequest(Socket clientSocket, String requestLine, BufferedReader reader,
-            FileResolver fileResolver) throws IOException {
+    public SocketHttpRequest(Socket clientSocket, FileResolver fileResolver) throws IOException {
         this.fileResolver = fileResolver;
-        this.requestLine = new RequestLine(requestLine);
 
+        final Reader reader = new InputStreamReader(clientSocket.getInputStream());
+        final BufferedReader bufferedReader = new BufferedReader(reader);
+        requestLine = new RequestLine(bufferedReader.readLine());
         headers = new ArrayList<Header>();
         String headerLine;
-        while ((headerLine = reader.readLine()) != null) {
+        while ((headerLine = bufferedReader.readLine()) != null) {
             if (headerLine.isEmpty()) {
                 break;
             }
             headers.add(new Header(headerLine));
         }
-        clientHostname = clientSocket.getInetAddress().getCanonicalHostName();
-    }
-
-    public String getClientHostname() {
-        return clientHostname;
-    }
-
-    public RequestLine getRequestLine() {
-        return requestLine;
-    }
-
-    public List<Header> getHeaders() {
-        return headers;
     }
 
     @Override
@@ -64,11 +59,11 @@ public class SocketHttpRequest implements HttpRequest {
 
     @Override
     public String getHeaderValue(String name) {
-        for (Header h : headers) {
-            if (name.equalsIgnoreCase(h.getName())) {
-                return h.getValue();
-            }
-        }
-        return null;
+        return headers.stream()
+                .filter(h -> name.equalsIgnoreCase(h.getName()))
+                .findFirst()
+                .map(h -> h.getValue())
+                .orElse(null);
+
     }
 }

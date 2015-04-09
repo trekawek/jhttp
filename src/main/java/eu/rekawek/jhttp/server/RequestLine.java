@@ -2,6 +2,15 @@ package eu.rekawek.jhttp.server;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * This class represents the first line of the HTTP request, eg.:
+ * <pre>
+ * GET /index.html HTTP/1.1
+ * </pre>
+ * 
+ * @author Tomasz Rękawek
+ *
+ */
 public class RequestLine {
 
     private final String method;
@@ -10,6 +19,9 @@ public class RequestLine {
 
     private final String version;
 
+    /**
+     * Parse the request line string.
+     */
     public RequestLine(final String requestLine) {
         final String[] split = StringUtils.split(requestLine, ' ');
         if (split.length >= 2) {
@@ -25,10 +37,16 @@ public class RequestLine {
         }
     }
 
+    /**
+     * @return requested URI
+     */
     public String getUri() {
         return uri;
     }
 
+    /**
+     * @return HTTP protocol version
+     */
     public String getVersion() {
         return version;
     }

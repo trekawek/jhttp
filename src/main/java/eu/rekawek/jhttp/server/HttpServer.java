@@ -9,16 +9,31 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.io.IOUtils;
+
 import eu.rekawek.jhttp.api.RequestProcessor;
 import eu.rekawek.jhttp.processor.DirectoryIndex;
 import eu.rekawek.jhttp.processor.DirectoryListing;
 import eu.rekawek.jhttp.processor.ResourceNotFound;
 import eu.rekawek.jhttp.processor.StaticFile;
 
+/**
+ * This class creates a server socket, registers all processors and for each connection creates a
+ * {@link ConnectionHandler} running in the new pooled thread.
+ * 
+ * @author Tomasz Rękawek
+ *
+ */
 public class HttpServer {
 
+    /**
+     * Port to listen.
+     */
     private static final int HTTP_PORT = 8888;
 
+    /**
+     * Size of the thread pool.
+     */
     private static final int THREADS_NO = 10;
 
     private final ExecutorService executor;
@@ -40,6 +55,9 @@ public class HttpServer {
         processors.add(new ResourceNotFound());
     }
 
+    /**
+     * Start listening.
+     */
     public void start() throws IOException {
         serverSocket = new ServerSocket(HTTP_PORT);
         do {
@@ -50,7 +68,10 @@ public class HttpServer {
         } while (!serverSocket.isClosed());
     }
 
-    public void stop() throws IOException {
-        serverSocket.close();
+    /**
+     * Stop listening.
+     */
+    public void stop() {
+        IOUtils.closeQuietly(serverSocket);
     }
 }

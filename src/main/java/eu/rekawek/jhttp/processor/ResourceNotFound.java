@@ -6,6 +6,12 @@ import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
 import eu.rekawek.jhttp.api.RequestProcessor;
 
+/**
+ * This processors renders a 404 error if requested file doesn't exist in the server root.
+ * 
+ * @author Tomasz Rękawek
+ *
+ */
 public class ResourceNotFound implements RequestProcessor {
 
     public boolean process(HttpRequest request, HttpResponse response) {

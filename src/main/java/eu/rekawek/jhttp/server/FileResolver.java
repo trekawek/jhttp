@@ -4,6 +4,12 @@ import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * This class looks for a file specified by the URI in the configured server root.
+ * 
+ * @author Tomasz Rękawek
+ *
+ */
 public class FileResolver {
 
     private final File serverRoot;

@@ -10,19 +10,25 @@ import java.util.List;
 import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
 
+/**
+ * This class wraps the socket's output stream and allows to send HTTP request status, headers and response
+ * body.
+ * 
+ * @author Tomasz Rękawek
+ */
 public class SocketHttpResponse implements HttpResponse {
 
     private final String httpVersion;
 
     private final OutputStream outputStream;
 
+    private final List<Header> headers = new ArrayList<Header>();
+
     private PrintWriter printWriter;
 
     private boolean outputStreamReturned;
 
     private boolean commited;
-
-    private final List<Header> headers = new ArrayList<Header>();
 
     private int statusCode = 200;
 
@@ -55,6 +61,7 @@ public class SocketHttpResponse implements HttpResponse {
         if (commited) {
             throw new IllegalStateException("Response has been committed");
         }
+
         for (int i = 0, s = headers.size(); i < s; i++) {
             if (name.equals(headers.get(i).getName())) {
                 headers.set(i, new Header(name, value));
@@ -97,6 +104,10 @@ public class SocketHttpResponse implements HttpResponse {
         return outputStream;
     }
 
+    /**
+     * Sends the set headers and status code. After invoking this method it's impossible to modify the header
+     * list or the response status.
+     */
     public void commit() {
         if (commited) {
             return;
@@ -104,13 +115,14 @@ public class SocketHttpResponse implements HttpResponse {
         commited = true;
         final PrintWriter writer = new PrintWriter(outputStream);
         writer.println(String.format("%s %d %s", httpVersion, statusCode, statusMessage));
-        for (final Header header : headers) {
-            writer.println(header);
-        }
+        headers.stream().forEach(writer::println);
         writer.println();
         writer.flush();
     }
 
+    /**
+     * Call flush on the created {@link PrintWriter} or the {@link OutputStream}.
+     */
     public void flush() throws IOException {
         if (printWriter != null) {
             printWriter.flush();

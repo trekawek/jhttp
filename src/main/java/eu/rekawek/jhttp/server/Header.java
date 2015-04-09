@@ -1,11 +1,25 @@
 package eu.rekawek.jhttp.server;
 
+/**
+ * A HTTP request or response header.
+ * 
+ * @author Tomasz Rękawek
+ *
+ */
 public class Header {
 
     private final String name;
 
     private final String value;
 
+    /**
+     * Parse the header in form:
+     * <pre>
+     * Header-Name: header-value
+     * </pre>
+     * 
+     * @param headerLine header in a form as above
+     */
     public Header(final String headerLine) {
         final int separatorIndex = headerLine.indexOf(": ");
         if (separatorIndex > 0) {
