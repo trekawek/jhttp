@@ -14,20 +14,19 @@ public class Header {
 
     /**
      * Parse the header in form:
+     * 
      * <pre>
      * Header-Name: header-value
      * </pre>
      * 
      * @param headerLine header in a form as above
      */
-    public Header(final String headerLine) {
+    public static Header parse(String headerLine) {
         final int separatorIndex = headerLine.indexOf(": ");
         if (separatorIndex > 0) {
-            this.name = headerLine.substring(0, separatorIndex);
-            this.value = headerLine.substring(separatorIndex);
+            return new Header(headerLine.substring(0, separatorIndex), headerLine.substring(separatorIndex));
         } else {
-            this.name = headerLine;
-            this.value = null;
+            return new Header(headerLine, null);
         }
     }
 

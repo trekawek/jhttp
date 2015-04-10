@@ -1,6 +1,7 @@
 package eu.rekawek.jhttp.server;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.Socket;
 import java.util.List;
 
@@ -28,12 +29,12 @@ public class ConnectionHandler implements Runnable {
 
     private final List<RequestProcessor> processors;
 
-    private final FileResolver fileResolver;
+    private final PathResolver pathResolver;
 
-    public ConnectionHandler(Socket clientSocket, List<RequestProcessor> processors, FileResolver fileResolver) {
+    public ConnectionHandler(Socket clientSocket, List<RequestProcessor> processors, PathResolver pathResolver) {
         this.clientSocket = clientSocket;
         this.processors = processors;
-        this.fileResolver = fileResolver;
+        this.pathResolver = pathResolver;
     }
 
     public void run() {
@@ -47,12 +48,12 @@ public class ConnectionHandler implements Runnable {
     }
 
     private void handleConnection() throws IOException, InterruptedException {
-        final HttpRequest request = new SocketHttpRequest(clientSocket, fileResolver);
+        final SocketHttpRequest request = new SocketHttpRequest(clientSocket, pathResolver);
         final SocketHttpResponse response = new SocketHttpResponse(clientSocket, request);
 
         try {
             process(request, response);
-        } catch (IOException e) {
+        } catch (UncheckedIOException e) {
             response.setStatus(500, "Server error");
             response.setHeader("Connection", "Close");
             response.getPrintWriter().println(String.format("Server error: " + e.getMessage()));
@@ -62,12 +63,11 @@ public class ConnectionHandler implements Runnable {
         response.flush();
     }
 
-    private void process(HttpRequest request, HttpResponse response) throws IOException {
-        for (final RequestProcessor processor : processors) {
-            if (processor.process(request, response)) {
-                break;
-            }
-        }
+    private void process(HttpRequest request, HttpResponse response) throws UncheckedIOException {
+        processors
+            .stream()
+            .filter(p -> p.process(request, response))
+            .findFirst();
     }
 
 }

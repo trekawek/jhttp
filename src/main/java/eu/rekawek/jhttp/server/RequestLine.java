@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class represents the first line of the HTTP request, eg.:
+ * 
  * <pre>
  * GET /index.html HTTP/1.1
  * </pre>
@@ -19,11 +20,18 @@ public class RequestLine {
 
     private final String version;
 
+    private RequestLine(String method, String uri, String version) {
+        this.method = method;
+        this.uri = uri;
+        this.version = version;
+    }
+
     /**
      * Parse the request line string.
      */
-    public RequestLine(final String requestLine) {
+    public static RequestLine parse(final String requestLine) {
         final String[] split = StringUtils.split(requestLine, ' ');
+        final String method, uri, version;
         if (split.length >= 2) {
             method = split[0];
             uri = split[1];
@@ -35,6 +43,7 @@ public class RequestLine {
         } else {
             version = null;
         }
+        return new RequestLine(method, uri, version);
     }
 
     /**

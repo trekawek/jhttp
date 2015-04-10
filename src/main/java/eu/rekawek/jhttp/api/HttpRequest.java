@@ -1,6 +1,6 @@
 package eu.rekawek.jhttp.api;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -33,7 +33,7 @@ public interface HttpRequest {
      * 
      * @return Resolved file.
      */
-    File resolveFile();
+    Path resolvePath();
 
     /**
      * Version of the HTTP protocol, usually {@code HTTP/1.1}

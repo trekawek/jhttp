@@ -1,6 +1,6 @@
 package eu.rekawek.jhttp.api;
 
-import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import aQute.bnd.annotation.ConsumerType;
 
@@ -23,5 +23,5 @@ public interface RequestProcessor {
      * @return {@code true} if the response has been created or {@code false} if given request type is not
      * supported by the processor
      */
-    boolean process(HttpRequest request, HttpResponse response) throws IOException;
+    boolean process(HttpRequest request, HttpResponse response) throws UncheckedIOException;
 }

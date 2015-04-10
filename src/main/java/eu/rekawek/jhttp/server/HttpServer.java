@@ -1,9 +1,9 @@
 package eu.rekawek.jhttp.server;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -40,13 +40,13 @@ public class HttpServer {
 
     private final List<RequestProcessor> processors;
 
-    private final FileResolver fileResolver;
+    private final PathResolver fileResolver;
 
     private ServerSocket serverSocket;
 
-    public HttpServer(final File serverRoot) {
+    public HttpServer(final Path serverRoot) {
         this.executor = Executors.newFixedThreadPool(THREADS_NO);
-        this.fileResolver = new FileResolver(serverRoot);
+        this.fileResolver = new PathResolver(serverRoot);
 
         processors = new ArrayList<>();
         processors.add(new DirectoryIndex());

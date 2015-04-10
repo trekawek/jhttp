@@ -1,6 +1,6 @@
 package eu.rekawek.jhttp.server;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,15 +10,15 @@ import org.apache.commons.lang3.StringUtils;
  * @author Tomasz Rękawek
  *
  */
-public class FileResolver {
+public class PathResolver {
 
-    private final File serverRoot;
+    private final Path serverRoot;
 
-    public FileResolver(File serverRoot) {
+    public PathResolver(Path serverRoot) {
         this.serverRoot = serverRoot;
     }
 
-    public File resolveFile(String uri) {
-        return new File(serverRoot, StringUtils.removeStart(uri, "/"));
+    public Path resolveFile(String uri) {
+        return serverRoot.resolve(StringUtils.removeStart(uri, "/"));
     }
 }

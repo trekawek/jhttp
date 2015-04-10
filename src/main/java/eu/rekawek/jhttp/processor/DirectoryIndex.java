@@ -1,9 +1,11 @@
 package eu.rekawek.jhttp.processor;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
@@ -20,20 +22,21 @@ public class DirectoryIndex implements RequestProcessor {
     private static final String[] INDEX_FILE_NAMES = new String[] { "index.html", "index.htm" };
 
     @Override
-    public boolean process(HttpRequest request, HttpResponse response) throws IOException {
-        final File file = request.resolveFile();
-        if (!file.isDirectory()) {
+    public boolean process(HttpRequest request, HttpResponse response) throws UncheckedIOException {
+        final Path directory = request.resolvePath();
+        if (!Files.isDirectory(directory)) {
             return false;
         }
 
-        final Optional<File> index =
-                Arrays.stream(INDEX_FILE_NAMES)
-                .map(s -> new File(file, s))
-                .filter(f -> f.isFile())
-                .findFirst();
-        if (index.isPresent()) {
-            StaticFile.serveFile(index.get(), response);
-        }
-        return index.isPresent();
+        return Arrays.stream(INDEX_FILE_NAMES)
+            .map(directory::resolve)
+            .filter(Files::exists)
+            .findFirst()
+            .map(curry(StaticFile::serveFile, response))
+            .orElse(false);
+    }
+    
+    private static <T, U, R> Function<U, R> curry(BiFunction<T, U, R> function, T t) {
+        return u -> function.apply(t, u);
     }
 }

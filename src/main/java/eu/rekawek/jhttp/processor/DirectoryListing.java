@@ -1,8 +1,10 @@
 package eu.rekawek.jhttp.processor;
 
-import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,9 +20,9 @@ import eu.rekawek.jhttp.api.RequestProcessor;
  */
 public class DirectoryListing implements RequestProcessor {
 
-    public boolean process(HttpRequest request, HttpResponse response) {
-        final File file = request.resolveFile();
-        if (!file.isDirectory()) {
+    public boolean process(HttpRequest request, HttpResponse response) throws UncheckedIOException {
+        final Path directory = request.resolvePath();
+        if (!Files.isDirectory(directory)) {
             return false;
         }
         response.addHeader("Content-Type", "text/html");
@@ -30,9 +32,14 @@ public class DirectoryListing implements RequestProcessor {
         if (!uri.isEmpty()) {
             appendLink("..", uri, writer);
         }
-        Arrays.stream(file.listFiles())
-            .map(File::getName)
-            .forEach(s -> appendLink(s, uri, writer));
+        try {
+            Files.list(directory)
+                .map(f -> f.getFileName())
+                .map(f -> f.toString())
+                .forEach(s -> appendLink(s, uri, writer));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return true;
     }
     

@@ -1,6 +1,7 @@
 package eu.rekawek.jhttp.processor;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
@@ -15,8 +16,8 @@ import eu.rekawek.jhttp.api.RequestProcessor;
 public class ResourceNotFound implements RequestProcessor {
 
     public boolean process(HttpRequest request, HttpResponse response) {
-        final File file = request.resolveFile();
-        if (file.exists()) {
+        final Path path = request.resolvePath();
+        if (Files.exists(path)) {
             return false;
         }
         response.setStatus(404, "File not found");

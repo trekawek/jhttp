@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
@@ -62,13 +63,18 @@ public class SocketHttpResponse implements HttpResponse {
             throw new IllegalStateException("Response has been committed");
         }
 
-        for (int i = 0, s = headers.size(); i < s; i++) {
-            if (name.equals(headers.get(i).getName())) {
-                headers.set(i, new Header(name, value));
-                return;
+        final Header newHeader = new Header(name, value);
+        boolean replaced = false;
+        final ListIterator<Header> li = headers.listIterator();
+        while (li.hasNext()) {
+            if (name.equals(li.next().getName())) {
+                replaced = true;
+                li.set(newHeader);
             }
         }
-        addHeader(name, value);
+        if (!replaced) {
+            addHeader(name, value);
+        }
     }
 
     @Override

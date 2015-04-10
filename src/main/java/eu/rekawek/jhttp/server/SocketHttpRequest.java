@@ -1,13 +1,15 @@
 package eu.rekawek.jhttp.server;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import eu.rekawek.jhttp.api.HttpRequest;
 
@@ -24,22 +26,19 @@ public class SocketHttpRequest implements HttpRequest {
 
     private final List<Header> headers;
 
-    private final FileResolver fileResolver;
+    private final PathResolver fileResolver;
 
-    public SocketHttpRequest(Socket clientSocket, FileResolver fileResolver) throws IOException {
+    public SocketHttpRequest(Socket clientSocket, PathResolver fileResolver) throws IOException {
         this.fileResolver = fileResolver;
 
         final Reader reader = new InputStreamReader(clientSocket.getInputStream());
         final BufferedReader bufferedReader = new BufferedReader(reader);
-        requestLine = new RequestLine(bufferedReader.readLine());
-        headers = new ArrayList<Header>();
-        String headerLine;
-        while ((headerLine = bufferedReader.readLine()) != null) {
-            if (headerLine.isEmpty()) {
-                break;
-            }
-            headers.add(new Header(headerLine));
-        }
+        requestLine = RequestLine.parse(bufferedReader.readLine());
+        headers = bufferedReader
+            .lines()
+            .filter(StringUtils::isNotBlank)
+            .map(Header::parse)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -48,7 +47,7 @@ public class SocketHttpRequest implements HttpRequest {
     }
 
     @Override
-    public File resolveFile() {
+    public Path resolvePath() {
         return fileResolver.resolveFile(getUri());
     }
 
@@ -59,11 +58,11 @@ public class SocketHttpRequest implements HttpRequest {
 
     @Override
     public String getHeaderValue(String name) {
-        return headers.stream()
-                .filter(h -> name.equalsIgnoreCase(h.getName()))
-                .findFirst()
-                .map(h -> h.getValue())
-                .orElse(null);
-
+        return headers
+            .stream()
+            .filter(h -> name.equalsIgnoreCase(h.getName()))
+            .findFirst()
+            .map(h -> h.getValue())
+            .orElse(null);
     }
 }
