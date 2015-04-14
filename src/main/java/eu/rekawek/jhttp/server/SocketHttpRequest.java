@@ -6,11 +6,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.Socket;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import eu.rekawek.jhttp.api.HttpRequest;
-
 import static eu.rekawek.jhttp.LambdaUtils.takeWhile;
 
 /**
@@ -59,5 +59,10 @@ public class SocketHttpRequest implements HttpRequest {
     @Override
     public String getHeaderValue(String name) {
         return headerList.getHeader(name);
+    }
+
+    @Override
+    public List<String> getHeaderValues(String name) {
+        return headerList.getHeaders(name);
     }
 }

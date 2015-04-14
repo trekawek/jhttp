@@ -1,6 +1,7 @@
 package eu.rekawek.jhttp.api;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -27,6 +28,14 @@ public interface HttpRequest {
      * @return Header value or {@code null} if there is no such header.
      */
     String getHeaderValue(String name);
+
+    /**
+     * Get a header values by name
+     * 
+     * @param name Header name, case insensitive.
+     * @return Header values or an empty list if there is no such header.
+     */
+    List<String> getHeaderValues(String name);
 
     /**
      * Uses request URI to find a requested file inside the server root directory.
