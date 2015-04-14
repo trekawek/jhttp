@@ -40,7 +40,7 @@ public class HeaderList {
      * Adds the header or replaces if there is already a header with the given name.
      * If there is multiple headers with the given name, only the first one is replaced.
      * 
-     * @param name of the header to set
+     * @param name of the header to set, case-insensitive
      * @param value of the header to set
      */
     public void setHeader(String name, String value) {
@@ -48,7 +48,7 @@ public class HeaderList {
         boolean replaced = false;
         final ListIterator<Header> li = headers.listIterator();
         while (li.hasNext()) {
-            if (name.equals(li.next().getName())) {
+            if (name.equalsIgnoreCase(li.next().getName())) {
                 replaced = true;
                 li.set(newHeader);
                 break;
