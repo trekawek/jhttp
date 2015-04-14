@@ -41,7 +41,7 @@ public class RequestLine {
         if (split.length >= 3) {
             version = split[2];
         } else {
-            version = null;
+            version = "HTTP/1.0";
         }
         return new RequestLine(method, uri, version);
     }
@@ -58,6 +58,13 @@ public class RequestLine {
      */
     public String getVersion() {
         return version;
+    }
+
+    /**
+     * @return HTTP request method (GET, POST, etc.)
+     */
+    public String getMethod() {
+        return method;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package eu.rekawek.jhttp.server;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * A HTTP request or response header.
  * 
@@ -24,9 +26,10 @@ public class Header {
     public static Header parse(String headerLine) {
         final int separatorIndex = headerLine.indexOf(": ");
         if (separatorIndex > 0) {
-            return new Header(headerLine.substring(0, separatorIndex), headerLine.substring(separatorIndex));
+            return new Header(headerLine.substring(0, separatorIndex),
+                    headerLine.substring(separatorIndex + 2));
         } else {
-            return new Header(headerLine, null);
+            return new Header(headerLine, "");
         }
     }
 
@@ -45,10 +48,6 @@ public class Header {
 
     @Override
     public String toString() {
-        if (value == null) {
-            return name;
-        } else {
-            return String.format("%s:%s", name, value);
-        }
+        return String.format("%s: %s", name, StringUtils.defaultString(value));
     }
 }

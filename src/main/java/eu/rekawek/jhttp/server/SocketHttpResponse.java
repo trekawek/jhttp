@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 
 import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
@@ -23,7 +20,7 @@ public class SocketHttpResponse implements HttpResponse {
 
     private final OutputStream outputStream;
 
-    private final List<Header> headers = new ArrayList<Header>();
+    private final HeaderList headerList;
 
     private PrintWriter printWriter;
 
@@ -38,6 +35,7 @@ public class SocketHttpResponse implements HttpResponse {
     public SocketHttpResponse(Socket clientSocket, HttpRequest request) throws IOException {
         this.outputStream = clientSocket.getOutputStream();
         this.httpVersion = request.getHttpVersion();
+        this.headerList = new HeaderList();
     }
 
     @Override
@@ -54,7 +52,7 @@ public class SocketHttpResponse implements HttpResponse {
         if (commited) {
             throw new IllegalStateException("Response has been committed");
         }
-        headers.add(new Header(name, value));
+        headerList.addHeader(name, value);
     }
 
     @Override
@@ -62,19 +60,7 @@ public class SocketHttpResponse implements HttpResponse {
         if (commited) {
             throw new IllegalStateException("Response has been committed");
         }
-
-        final Header newHeader = new Header(name, value);
-        boolean replaced = false;
-        final ListIterator<Header> li = headers.listIterator();
-        while (li.hasNext()) {
-            if (name.equals(li.next().getName())) {
-                replaced = true;
-                li.set(newHeader);
-            }
-        }
-        if (!replaced) {
-            addHeader(name, value);
-        }
+        headerList.setHeader(name, value);
     }
 
     @Override
@@ -107,6 +93,7 @@ public class SocketHttpResponse implements HttpResponse {
         if (printWriter != null) {
             throw new IllegalStateException("getPrintWriter() has been already called");
         }
+        outputStreamReturned = true;
         return outputStream;
     }
 
@@ -121,7 +108,7 @@ public class SocketHttpResponse implements HttpResponse {
         commited = true;
         final PrintWriter writer = new PrintWriter(outputStream);
         writer.println(String.format("%s %d %s", httpVersion, statusCode, statusMessage));
-        headers.stream().forEach(writer::println);
+        headerList.getHeaders().stream().forEach(writer::println);
         writer.println();
         writer.flush();
     }

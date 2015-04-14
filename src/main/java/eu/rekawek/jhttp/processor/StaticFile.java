@@ -1,13 +1,10 @@
 package eu.rekawek.jhttp.processor;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.commons.io.IOUtils;
 
 import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
@@ -35,10 +32,10 @@ public class StaticFile implements RequestProcessor {
     static boolean serveFile(HttpResponse response, Path file) {
         final String contentType = URLConnection.guessContentTypeFromName(file.toString());
         if (contentType != null) {
-            response.addHeader("Content-Type", contentType);
+            response.setContentType(contentType);
         }
-        try (final InputStream is = Files.newInputStream(file)) {
-            IOUtils.copy(is, response.getOutputStream());
+        try {
+            Files.copy(file, response.getOutputStream());
             return true;
         } catch (IOException e) {
             throw new UncheckedIOException(e);

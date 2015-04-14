@@ -1,6 +1,7 @@
 package eu.rekawek.jhttp.server;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Path;
@@ -29,7 +30,7 @@ public class HttpServer {
     /**
      * Port to listen.
      */
-    private static final int HTTP_PORT = 8888;
+    public static final int HTTP_PORT = 8888;
 
     /**
      * Size of the thread pool.
@@ -42,7 +43,7 @@ public class HttpServer {
 
     private final PathResolver fileResolver;
 
-    private ServerSocket serverSocket;
+    private volatile ServerSocket serverSocket;
 
     public HttpServer(final Path serverRoot) {
         this.executor = Executors.newFixedThreadPool(THREADS_NO);
@@ -58,14 +59,18 @@ public class HttpServer {
     /**
      * Start listening.
      */
-    public void start() throws IOException {
-        serverSocket = new ServerSocket(HTTP_PORT);
-        do {
-            final Socket clientSocket = serverSocket.accept();
-            final ConnectionHandler connectionHandler = new ConnectionHandler(clientSocket, processors,
-                    fileResolver);
-            executor.submit(connectionHandler);
-        } while (!serverSocket.isClosed());
+    public void start() {
+        try {
+            serverSocket = new ServerSocket(HTTP_PORT);
+            do {
+                final Socket clientSocket = serverSocket.accept();
+                final ConnectionHandler connectionHandler = new ConnectionHandler(clientSocket, processors,
+                        fileResolver);
+                executor.submit(connectionHandler);
+            } while (!serverSocket.isClosed());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
@@ -73,5 +78,12 @@ public class HttpServer {
      */
     public void stop() {
         IOUtils.closeQuietly(serverSocket);
+    }
+
+    /**
+     * @return true if the server is bound
+     */
+    public boolean isBound() {
+        return serverSocket != null;
     }
 }

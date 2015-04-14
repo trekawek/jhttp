@@ -25,7 +25,7 @@ public class DirectoryListing implements RequestProcessor {
         if (!Files.isDirectory(directory)) {
             return false;
         }
-        response.addHeader("Content-Type", "text/html");
+        response.setContentType("text/html");
 
         final String uri = StringUtils.removeEnd(request.getUri(), "/");
         final PrintWriter writer = response.getPrintWriter();
@@ -34,8 +34,7 @@ public class DirectoryListing implements RequestProcessor {
         }
         try {
             Files.list(directory)
-                .map(f -> f.getFileName())
-                .map(f -> f.toString())
+                .map(f -> f.getFileName().toString())
                 .forEach(s -> appendLink(s, uri, writer));
         } catch (IOException e) {
             throw new UncheckedIOException(e);

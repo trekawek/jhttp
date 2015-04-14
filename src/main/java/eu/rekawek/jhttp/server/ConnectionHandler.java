@@ -69,5 +69,4 @@ public class ConnectionHandler implements Runnable {
             .filter(p -> p.process(request, response))
             .findFirst();
     }
-
 }

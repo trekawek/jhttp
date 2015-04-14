@@ -4,12 +4,12 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import eu.rekawek.jhttp.api.HttpRequest;
 import eu.rekawek.jhttp.api.HttpResponse;
 import eu.rekawek.jhttp.api.RequestProcessor;
+
+import static eu.rekawek.jhttp.LambdaUtils.curry;
 
 /**
  * This processor renders the {@code index.htm[l]} file, if it exists in the requested directory.
@@ -34,9 +34,5 @@ public class DirectoryIndex implements RequestProcessor {
             .findFirst()
             .map(curry(StaticFile::serveFile, response))
             .orElse(false);
-    }
-    
-    private static <T, U, R> Function<U, R> curry(BiFunction<T, U, R> function, T t) {
-        return u -> function.apply(t, u);
     }
 }
