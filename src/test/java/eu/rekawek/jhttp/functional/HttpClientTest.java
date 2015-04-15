@@ -25,18 +25,19 @@ import static org.junit.Assert.*;
 
 public class HttpClientTest {
 
-    private static final int TEST_HTTP_PORT = 34567;
-
     private final HttpClient client = HttpClientBuilder.create().build();
 
-    private final HttpServer server = new HttpServer(Paths.get("src/test/resources/http-server/server-root"), TEST_HTTP_PORT, 1);
+    private final HttpServer server = new HttpServer(Paths.get("src/test/resources/http-server/server-root"),
+            0, 1);
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    private int httpPort;
 
     @Before
     public void setUp() throws IOException, InterruptedException {
         executor.submit(() -> server.start());
-        waitForTheServer();
+        httpPort = waitForTheServer();
     }
 
     @After
@@ -79,22 +80,25 @@ public class HttpClientTest {
     }
 
     private HttpResponse getResponse(String uri) throws IOException {
-        final HttpUriRequest request = new HttpGet("http://localhost:" + TEST_HTTP_PORT + uri);
+        final HttpUriRequest request = new HttpGet("http://localhost:" + httpPort + uri);
         return client.execute(request);
     }
 
-    private static void waitForTheServer() throws IOException, UnknownHostException, InterruptedException {
-        boolean opened = false;
+    private int waitForTheServer() throws IOException, UnknownHostException, InterruptedException {
         for (int i = 0; i < 10; i++) {
             try {
-                new Socket("localhost", TEST_HTTP_PORT).close();
-                opened = true;
-                break;
+                final int serverPort = server.getServerPort();
+                if (serverPort > 0) {
+                    new Socket("localhost", serverPort).close();
+                    return serverPort;
+                }
             } catch (ConnectException e) {
-                Thread.sleep(100);
+                // let's wait more
             }
+            Thread.sleep(100);
         }
-        assertTrue(opened);
+        fail("HTTP server hasn't started");
+        return 0;
     }
 
 }

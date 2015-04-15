@@ -35,7 +35,7 @@ public class HttpServer {
 
     private final int port;
 
-    private ServerSocket serverSocket;
+    private volatile ServerSocket serverSocket;
 
     public HttpServer(Path serverRoot, int port, int threadPoolSize) {
         this.executor = Executors.newFixedThreadPool(threadPoolSize);
@@ -71,5 +71,13 @@ public class HttpServer {
      */
     public void stop() {
         IOUtils.closeQuietly(serverSocket);
+    }
+
+    public int getServerPort() {
+        if (serverSocket == null) {
+            return 0;
+        } else {
+            return serverSocket.getLocalPort();
+        }
     }
 }
