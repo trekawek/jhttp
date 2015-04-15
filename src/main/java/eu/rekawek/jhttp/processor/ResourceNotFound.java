@@ -15,12 +15,14 @@ import eu.rekawek.jhttp.api.RequestProcessor;
  */
 public class ResourceNotFound implements RequestProcessor {
 
+    private static final int HTTP_PAGE_NOT_FOUND_STATUS = 404;
+
     public boolean process(HttpRequest request, HttpResponse response) {
         final Path path = request.resolvePath();
         if (Files.exists(path)) {
             return false;
         }
-        response.setStatus(404, "File not found");
+        response.setStatus(HTTP_PAGE_NOT_FOUND_STATUS, "File not found");
         response.getPrintWriter().println(String.format("File %s can't be found.", request.getUri()));
         return true;
     }

@@ -22,6 +22,7 @@ public interface RequestProcessor {
      * @param response mutable object that allows to send response to the client
      * @return {@code true} if the response has been created or {@code false} if given request type is not
      * supported by the processor
+     * @throws UncheckedIOException in case of the processing error
      */
-    boolean process(HttpRequest request, HttpResponse response) throws UncheckedIOException;
+    boolean process(HttpRequest request, HttpResponse response);
 }

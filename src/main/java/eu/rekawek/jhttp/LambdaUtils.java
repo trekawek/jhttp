@@ -15,7 +15,10 @@ import java.util.stream.StreamSupport;
  * @author Tomasz Rękawek
  *
  */
-public class LambdaUtils {
+public final class LambdaUtils {
+
+    private LambdaUtils() {
+    }
 
     /**
      * Curry operation binding the given value as a first argument of the two-argument function.

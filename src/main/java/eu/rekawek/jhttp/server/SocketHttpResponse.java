@@ -16,6 +16,8 @@ import eu.rekawek.jhttp.api.HttpResponse;
  */
 public class SocketHttpResponse implements HttpResponse {
 
+    private static final int HTTP_OK_STATUS = 200;
+
     private final String httpVersion;
 
     private final OutputStream outputStream;
@@ -28,7 +30,7 @@ public class SocketHttpResponse implements HttpResponse {
 
     private boolean commited;
 
-    private int statusCode = 200;
+    private int statusCode = HTTP_OK_STATUS;
 
     private String statusMessage = "OK";
 
@@ -40,18 +42,14 @@ public class SocketHttpResponse implements HttpResponse {
 
     @Override
     public void setStatus(int code, String message) {
-        if (commited) {
-            throw new IllegalStateException("Response has been committed");
-        }
+        checkIfResponseNotCommitted();
         this.statusCode = code;
         this.statusMessage = message;
     }
 
     @Override
     public void addHeader(String name, String value) {
-        if (commited) {
-            throw new IllegalStateException("Response has been committed");
-        }
+        checkIfResponseNotCommitted();
         headerList.addHeader(name, value);
     }
 
@@ -65,9 +63,7 @@ public class SocketHttpResponse implements HttpResponse {
 
     @Override
     public void setContentType(String contentType) {
-        if (commited) {
-            throw new IllegalStateException("Response has been committed");
-        }
+        checkIfResponseNotCommitted();
         setHeader("Content-Type", contentType);
     }
 
@@ -121,6 +117,12 @@ public class SocketHttpResponse implements HttpResponse {
             printWriter.flush();
         } else {
             outputStream.flush();
+        }
+    }
+
+    private void checkIfResponseNotCommitted() {
+        if (commited) {
+            throw new IllegalStateException("Response has been committed");
         }
     }
 }

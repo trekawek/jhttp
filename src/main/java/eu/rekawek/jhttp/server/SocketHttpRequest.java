@@ -31,7 +31,7 @@ public class SocketHttpRequest implements HttpRequest {
     public SocketHttpRequest(Socket clientSocket, PathResolver fileResolver) throws IOException {
         this.fileResolver = fileResolver;
         this.headerList = new HeaderList();
-        
+
         final Reader reader = new InputStreamReader(clientSocket.getInputStream());
         final BufferedReader bufferedReader = new BufferedReader(reader);
         requestLine = RequestLine.parse(bufferedReader.readLine());

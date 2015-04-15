@@ -25,6 +25,8 @@ public class ConnectionHandler implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionHandler.class);
 
+    private static final int HTTP_SERVER_ERROR_STATUS = 500;
+
     private final Socket clientSocket;
 
     private final List<RequestProcessor> processors;
@@ -54,16 +56,17 @@ public class ConnectionHandler implements Runnable {
         try {
             process(request, response);
         } catch (UncheckedIOException e) {
-            response.setStatus(500, "Server error");
+            response.setStatus(HTTP_SERVER_ERROR_STATUS, "Server error");
             response.setHeader("Connection", "Close");
             response.getPrintWriter().println(String.format("Server error: " + e.getMessage()));
+            LOG.error("Error in the request processing", e);
         }
 
         response.commit();
         response.flush();
     }
 
-    private void process(HttpRequest request, HttpResponse response) throws UncheckedIOException {
+    private void process(HttpRequest request, HttpResponse response) {
         processors
             .stream()
             .filter(p -> p.process(request, response))

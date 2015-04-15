@@ -19,7 +19,7 @@ import eu.rekawek.jhttp.api.RequestProcessor;
 public class StaticFile implements RequestProcessor {
 
     @Override
-    public boolean process(HttpRequest request, HttpResponse response) throws UncheckedIOException {
+    public boolean process(HttpRequest request, HttpResponse response) {
         final Path file = request.resolvePath();
         if (!Files.isReadable(file)) {
             return false;

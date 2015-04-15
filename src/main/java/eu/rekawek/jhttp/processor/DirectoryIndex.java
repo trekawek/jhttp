@@ -1,6 +1,5 @@
 package eu.rekawek.jhttp.processor;
 
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -22,7 +21,7 @@ public class DirectoryIndex implements RequestProcessor {
     private static final String[] INDEX_FILE_NAMES = new String[] { "index.html", "index.htm" };
 
     @Override
-    public boolean process(HttpRequest request, HttpResponse response) throws UncheckedIOException {
+    public boolean process(HttpRequest request, HttpResponse response) {
         final Path directory = request.resolvePath();
         if (!Files.isDirectory(directory)) {
             return false;

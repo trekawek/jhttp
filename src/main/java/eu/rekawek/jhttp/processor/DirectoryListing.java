@@ -20,7 +20,7 @@ import eu.rekawek.jhttp.api.RequestProcessor;
  */
 public class DirectoryListing implements RequestProcessor {
 
-    public boolean process(HttpRequest request, HttpResponse response) throws UncheckedIOException {
+    public boolean process(HttpRequest request, HttpResponse response) {
         final Path directory = request.resolvePath();
         if (!Files.isDirectory(directory)) {
             return false;

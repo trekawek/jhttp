@@ -14,6 +14,11 @@ public class Header {
 
     private final String value;
 
+    public Header(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
     /**
      * Parse the header in form:
      * 
@@ -31,11 +36,6 @@ public class Header {
         } else {
             return new Header(headerLine, "");
         }
-    }
-
-    public Header(String name, String value) {
-        this.name = name;
-        this.value = value;
     }
 
     public String getName() {
