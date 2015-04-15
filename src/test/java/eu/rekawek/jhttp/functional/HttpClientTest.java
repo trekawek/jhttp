@@ -25,9 +25,11 @@ import static org.junit.Assert.*;
 
 public class HttpClientTest {
 
+    private static final int TEST_HTTP_PORT = 34567;
+
     private final HttpClient client = HttpClientBuilder.create().build();
 
-    private final HttpServer server = new HttpServer(Paths.get("src/test/resources/http-server/server-root"));
+    private final HttpServer server = new HttpServer(Paths.get("src/test/resources/http-server/server-root"), TEST_HTTP_PORT, 1);
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -77,7 +79,7 @@ public class HttpClientTest {
     }
 
     private HttpResponse getResponse(String uri) throws IOException {
-        final HttpUriRequest request = new HttpGet("http://localhost:" + HttpServer.HTTP_PORT + uri);
+        final HttpUriRequest request = new HttpGet("http://localhost:" + TEST_HTTP_PORT + uri);
         return client.execute(request);
     }
 
@@ -85,7 +87,7 @@ public class HttpClientTest {
         boolean opened = false;
         for (int i = 0; i < 10; i++) {
             try {
-                new Socket("localhost", HttpServer.HTTP_PORT).close();
+                new Socket("localhost", TEST_HTTP_PORT).close();
                 opened = true;
                 break;
             } catch (ConnectException e) {

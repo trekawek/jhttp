@@ -27,27 +27,20 @@ import eu.rekawek.jhttp.processor.StaticFile;
  */
 public class HttpServer {
 
-    /**
-     * Port to listen.
-     */
-    public static final int HTTP_PORT = 8888;
-
-    /**
-     * Size of the thread pool.
-     */
-    private static final int THREADS_NO = 10;
-
     private final ExecutorService executor;
 
     private final List<RequestProcessor> processors;
 
     private final PathResolver fileResolver;
 
-    private volatile ServerSocket serverSocket;
+    private final int port;
 
-    public HttpServer(final Path serverRoot) {
-        this.executor = Executors.newFixedThreadPool(THREADS_NO);
+    private ServerSocket serverSocket;
+
+    public HttpServer(Path serverRoot, int port, int threadPoolSize) {
+        this.executor = Executors.newFixedThreadPool(threadPoolSize);
         this.fileResolver = new PathResolver(serverRoot);
+        this.port = port;
 
         processors = new ArrayList<>();
         processors.add(new DirectoryIndex());
@@ -61,7 +54,7 @@ public class HttpServer {
      */
     public void start() {
         try {
-            serverSocket = new ServerSocket(HTTP_PORT);
+            serverSocket = new ServerSocket(port);
             do {
                 final Socket clientSocket = serverSocket.accept();
                 final ConnectionHandler connectionHandler = new ConnectionHandler(clientSocket, processors,
@@ -78,12 +71,5 @@ public class HttpServer {
      */
     public void stop() {
         IOUtils.closeQuietly(serverSocket);
-    }
-
-    /**
-     * @return true if the server is bound
-     */
-    public boolean isBound() {
-        return serverSocket != null;
     }
 }
