@@ -68,8 +68,8 @@ public class HeaderList {
     public List<String> getHeaders(String name) {
         return headers
                 .stream()
-                .filter(h->name.equalsIgnoreCase(h.getName()))
-                .map(h->h.getValue())
+                .filter(h -> name.equalsIgnoreCase(h.getName()))
+                .map(Header::getValue)
                 .collect(Collectors.toList());
     }
 
